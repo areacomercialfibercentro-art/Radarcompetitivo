@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de Competencia · Fiber Centro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f7f4; --card:#ffffff; --ink:#15211a; --muted:#5f6d64; --line:#e2e8e3;
+  --brand:#139a4b; --brand-d:#0d6f36; --brand-l:#e4f5ea;
+  --warn:#c2410c; --warn-l:#fff1e8; --info:#1d4ed8; --info-l:#e8efff;
+  --r:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5}
+a{color:var(--brand-d)}
+header{background:linear-gradient(120deg,#0d6f36,#139a4b 60%,#38b86b);color:#fff;padding:22px 24px 0}
+.hwrap{max-width:1200px;margin:0 auto}
+h1{margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.sub{opacity:.9;font-size:14px;margin-top:2px}
+nav{display:flex;gap:4px;margin-top:16px;overflow-x:auto}
+nav a{color:#e9fff1;text-decoration:none;padding:10px 14px;border-radius:10px 10px 0 0;font-weight:600;font-size:14px;white-space:nowrap}
+nav a.on{background:var(--bg);color:var(--brand-d)}
+main{max-width:1200px;margin:0 auto;padding:22px 24px 60px}
+section{display:none}
+section.on{display:block}
+h2{font-size:19px;margin:0 0 4px;letter-spacing:-.01em}
+.lead{color:var(--muted);margin:0 0 18px;font-size:14px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.kpi .n{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.kpi .l{color:var(--muted);font-size:13px}
+.kpi .s{font-size:12px;color:var(--muted);margin-top:6px}
+.alert{border-left:4px solid var(--warn);background:var(--warn-l)}
+.alert.i{border-left-color:var(--info);background:var(--info-l)}
+.alert h4{margin:0 0 4px;font-size:15px}
+.alert p{margin:0;font-size:14px}
+.src{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#eef2ef;color:#3c4a41;margin:2px 4px 2px 0}
+.tag.nac{background:#eef0ff;color:#3730a3}
+.tag.reg{background:var(--brand-l);color:var(--brand-d)}
+.tag.pend{background:#fff4d6;color:#8a5a00}
+.mapwrap{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px}
+@media(max-width:860px){.mapwrap{grid-template-columns:1fr}}
+svg text{font-family:inherit}
+.dist{cursor:pointer}
+.dist:hover circle.dot,.dist.sel circle.dot{stroke:#0d6f36;stroke-width:3}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em;background:#fafcfa}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+.lvl{display:inline-block;width:22px;height:22px;border-radius:6px;text-align:center;line-height:22px;font-size:11px;font-weight:800}
+.l-c{background:#139a4b;color:#fff}
+.l-p{background:#f59e0b;color:#fff}
+.l-a{background:#7c3aed;color:#fff}
+.l-n{background:#eef2ef;color:#9aa59e}
+.comp-card h3{margin:0;font-size:17px}
+.comp-card .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+.comp-card ul{margin:8px 0 0;padding-left:18px;font-size:14px}
+.comp-card li{margin:2px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,input,textarea,button{font:inherit;font-size:14px}
+select,input,textarea{border:1px solid #cfd8d2;border-radius:10px;padding:8px 10px;background:#fff;color:var(--ink)}
+button{border:0;border-radius:10px;padding:9px 14px;font-weight:700;cursor:pointer;background:var(--brand);color:#fff}
+button.ghost{background:#eef2ef;color:var(--ink)}
+button.danger{background:#fee2e2;color:#991b1b}
+button:disabled{opacity:.5;cursor:default}
+.offer{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+.offer .price{font-size:22px;font-weight:800;text-align:right;line-height:1.1}
+.offer .price small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#f1f5f2}
+.b-web{background:#e8efff;color:#1d4ed8}.b-fb{background:#e7f0ff;color:#1e40af}.b-campo{background:#f3e8ff;color:#6b21a8}.b-wa{background:#dcfce7;color:#166534}
+form.cap{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+form.cap label{font-size:12px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:4px}
+.note{font-size:13px;color:var(--muted)}
+.status{font-size:13px;margin-top:8px}
+.bar{height:10px;border-radius:99px;background:#eef2ef;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand)}
+.fc-row td{background:#f0faf3;font-weight:600}
+details summary{cursor:pointer;font-weight:700}
+.muted{color:var(--muted)}
+.gch{grid-template-columns:repeat(auto-fit,minmax(min(100%,500px),1fr))}
+.ct{margin:0;font-size:16px}.cs{margin:2px 0 10px;font-size:13px;color:var(--muted)}
+#tip{position:fixed;pointer-events:none;background:#15211a;color:#fff;font-size:12px;padding:6px 9px;border-radius:8px;z-index:50;display:none;max-width:260px;line-height:1.4}
+.ax{font-size:11px;fill:#5f6d64}.lab{font-size:12px;fill:#15211a}.val{font-size:11px;fill:#15211a;font-weight:700}
+.hit{fill:transparent;cursor:default}
+.autobox{display:flex;gap:10px;align-items:center;font-size:13px;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:#fff;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <h1>📡 Radar de Competencia Regional</h1>
+  <div class="sub">Fiber Centro · Valle del Mantaro (Huancayo · Concepción · Jauja) · Línea base de investigación: 10 nov 2026</div>
+  <nav id="nav">
+    <a href="#resumen">Resumen</a>
+    <a href="#graficos">Gráficos</a>
+    <a href="#mapa">Mapa por distrito</a>
+    <a href="#competidores">Competidores</a>
+    <a href="#ofertas">Muro de ofertas</a>
+    <a href="#comparador">Comparador</a>
+    <a href="#fuentes">Fuentes y monitoreo</a>
+  </nav>
+</div></header>
+
+<div id="tip"></div>
+<main>
+  <div class="autobox" id="autoBox">🔄 <span id="autoTxt">Actualización automática: todavía no se ha ejecutado. La línea base es del 10 nov 2026.</span></div>
+<!-- RESUMEN -->
+<section id="s-resumen">
+  <h2>Resumen ejecutivo</h2>
+  <p class="lead">Lo que dice la investigación pública sobre la competencia en tus distritos. Cada dato tiene su fuente en la pestaña "Fuentes".</p>
+  <div class="grid g4" id="kpis"></div>
+  <h2 style="margin-top:24px">Alertas comerciales</h2>
+  <p class="lead">Movimientos de la competencia que conviene vigilar o responder.</p>
+  <div class="grid g2" id="alerts"></div>
+  <h2 style="margin-top:24px">🔔 Alertas de la revisión semanal</h2>
+  <p class="lead">Las agrega la revisión automática de cada lunes: ofertas nuevas, cambios de precio y competidores nuevos, siempre con el enlace a la fuente.</p>
+  <div class="grid" id="autoAlerts"><p class="note">Aún no hay alertas automáticas.</p></div>
+</section>
+
+<!-- GRAFICOS -->
+<section id="s-graficos">
+  <h2>Análisis visual</h2>
+  <p class="lead">Los gráficos se recalculan solos con cada oferta que registre tu equipo, con cada actualización automática y con los planes de Fiber Centro que cargues en el Comparador. Pasa el cursor sobre las barras para ver el detalle.</p>
+  <div class="grid gch">
+    <div class="card"><h3 class="ct">¿Quién da más velocidad por sol?</h3><p class="cs">El menor precio regular por cada 100 Mbps de cada operador (más corto = más barato)</p><div id="ch1"></div></div>
+    <div class="card"><h3 class="ct">Planes de 1 Gbps: promo vs. precio regular</h3><p class="cs">Cuánto sube cada plan cuando termina la promoción</p><div class="legend" style="margin:0 0 6px"><span><i class="sw" style="background:#eb6834;border-radius:50%"></i>Precio promo</span><span><i class="sw" style="background:#2a78d6;border-radius:50%"></i>Precio regular</span></div><div id="ch2"></div></div>
+    <div class="card"><h3 class="ct">Presión competitiva por distrito</h3><p class="cs">Número de competidores detectados (confirmados, por publicidad o en campo)</p><div class="legend" style="margin:0 0 6px"><span><i class="sw" style="background:#139a4b"></i>Con cobertura Fiber Centro</span><span><i class="sw" style="background:#a3b1a8"></i>Zona objetivo</span></div><div id="ch3"></div></div>
+    <div class="card"><h3 class="ct">Actividad de la competencia</h3><p class="cs">Ofertas nuevas registradas por semana (equipo + actualización automática), últimas 12 semanas</p><div id="ch4"></div></div>
+  </div>
+</section>
+
+<!-- MAPA -->
+<section id="s-mapa">
+  <h2>Mapa de presencia por distrito</h2>
+  <p class="lead">Es un esquema del valle (no a escala). Haz clic en un distrito para ver quién opera ahí. Las ofertas que registre tu equipo en campo también se marcan aquí.</p>
+  <div class="mapwrap">
+    <div class="card">
+      <svg id="map" viewBox="0 0 560 640" width="100%" role="img" aria-label="Mapa esquemático de distritos"></svg>
+      <div class="legend">
+        <span><i class="sw" style="background:#139a4b"></i>Cobertura Fiber Centro (declarada)</span>
+        <span><i class="sw" style="background:#cbd5ce"></i>Zona objetivo</span>
+        <span>El número = competidores detectados</span>
+      </div>
+    </div>
+    <div class="card" id="distPanel"></div>
+  </div>
+  <h2 style="margin-top:24px">Matriz competidor × distrito</h2>
+  <p class="lead">
+    <span class="lvl l-c">✓</span> Confirmado por la empresa o una fuente oficial &nbsp;
+    <span class="lvl l-p">P</span> Lo anuncia en publicidad o a nivel de provincia (por verificar) &nbsp;
+    <span class="lvl l-a">C</span> Detectado en campo por tu equipo &nbsp;
+    <span class="lvl l-n">·</span> Sin datos
+  </p>
+  <div class="tbl"><table id="matrix"></table></div>
+</section>
+
+<!-- COMPETIDORES -->
+<section id="s-competidores">
+  <h2>Fichas de competidores</h2>
+  <p class="lead">Incluye a los 9 que tus asesores detectaron y a otros operadores que aparecieron en la investigación.</p>
+  <div class="row" style="margin-bottom:12px">
+    <select id="fTipo"><option value="">Todos</option><option value="reg">Regionales</option><option value="nac">Nacionales</option><option value="pend">Por investigar</option></select>
+  </div>
+  <div class="grid g2" id="comps"></div>
+</section>
+
+<!-- OFERTAS -->
+<section id="s-ofertas">
+  <h2>Muro de ofertas</h2>
+  <p class="lead">Combina la línea base de la investigación con lo que tu equipo registra (afiches, posts, WhatsApp). Todo lo que se registra aquí lo ve el resto del equipo.</p>
+  <div class="card" style="margin-bottom:14px">
+    <details id="capBox">
+      <summary>➕ Registrar una oferta detectada</summary>
+      <p class="note" style="margin:8px 0 12px">Para afiches o volantes: anota los datos tal como aparecen y guarda la foto en tu carpeta compartida. Si la oferta salió en redes, pega el enlace.</p>
+      <form class="cap" id="capForm">
+        <label>Competidor<select name="competidor" required></select></label>
+        <label>Distrito<select name="distrito"></select></label>
+        <label>Plan / nombre<input name="plan" placeholder="Ej. Plan Hogar"></label>
+        <label>Velocidad (Mbps)<input name="velocidad" type="number" min="0" placeholder="600"></label>
+        <label>Precio promo (S/)<input name="precioPromo" type="number" step="0.01" min="0"></label>
+        <label>Precio regular (S/)<input name="precioRegular" type="number" step="0.01" min="0"></label>
+        <label>Duración de la promo<input name="duracion" placeholder="3 meses"></label>
+        <label>Canal<select name="canal"><option value="campo">Afiche / volante (campo)</option><option value="fb">Facebook / Instagram / TikTok</option><option value="wa">WhatsApp / llamada</option><option value="web">Web</option><option value="otro">Otro</option></select></label>
+        <label>Fecha en que se vio<input name="fecha" type="date"></label>
+        <label>Registrado por<input name="registradoPor" placeholder="Nombre del asesor"></label>
+        <label style="grid-column:1/-1">Detalles (instalación, TV, regalos, condiciones)<textarea name="nota" rows="2"></textarea></label>
+        <label style="grid-column:1/-1">Enlace (opcional)<input name="enlace" type="url" placeholder="https://"></label>
+        <div style="grid-column:1/-1" class="row"><button type="submit" id="capBtn">Guardar oferta</button><span class="status" id="capStatus"></span></div>
+      </form>
+    </details>
+  </div>
+  <div class="row" style="margin-bottom:12px">
+    <select id="oComp"><option value="">Todos los competidores</option></select>
+    <select id="oDist"><option value="">Todos los distritos</option></select>
+    <select id="oCanal"><option value="">Todos los canales</option><option value="web">Web</option><option value="fb">Redes</option><option value="campo">Campo</option><option value="wa">WhatsApp</option></select>
+    <span class="note" id="oCount"></span>
+  </div>
+  <div class="status" id="dbStatus"></div>
+  <div class="grid" id="offers"></div>
+</section>
+
+<!-- COMPARADOR -->
+<section id="s-comparador">
+  <h2>Comparador de precios</h2>
+  <p class="lead">Precio por cada 100 Mbps a tarifa regular, para comparar planes de distinta velocidad. Agrega tus propios planes de Fiber Centro para ver dónde estás.</p>
+  <div class="card" style="margin-bottom:14px">
+    <details>
+      <summary>Mis planes Fiber Centro</summary>
+      <p class="note">La web de Fiber Centro solo muestra "desde S/ 50" en texto. Ingresa tus planes vigentes y se guardan para todo el equipo.</p>
+      <div id="fcPlans"></div>
+      <div class="row" style="margin-top:8px">
+        <input id="fcV" type="number" placeholder="Mbps" style="width:110px">
+        <input id="fcP" type="number" step="0.01" placeholder="Precio promo S/" style="width:150px">
+        <input id="fcR" type="number" step="0.01" placeholder="Precio regular S/" style="width:150px">
+        <input id="fcD" placeholder="Duración promo" style="width:150px">
+        <button id="fcAdd">Agregar plan</button>
+        <span class="status" id="fcStatus"></span>
+      </div>
+    </details>
+  </div>
+  <div class="row" style="margin-bottom:12px">
+    <select id="cBand"><option value="">Todas las velocidades</option><option value="0-399">Hasta 399 Mbps</option><option value="400-699">400–699 Mbps</option><option value="700-99999">700 Mbps o más</option></select>
+    <select id="cSort"><option value="p100">Ordenar por S/ por 100 Mbps</option><option value="reg">Ordenar por precio regular</option><option value="promo">Ordenar por precio promo</option></select>
+  </div>
+  <div class="tbl"><table id="cmp"></table></div>
+  <p class="note" style="margin-top:8px">Solo internet, salvo donde se indica TV. WOW (web nacional) y Bitel son tarifas de referencia nacional. Confirma su vigencia en Huancayo.</p>
+</section>
+
+<!-- FUENTES -->
+<section id="s-fuentes">
+  <h2>Fuentes y rutina de monitoreo</h2>
+  <p class="lead">Enlaces directos para revisar cada semana. Los enlaces de Facebook e Instagram solo abren si has iniciado sesión en Facebook; la Biblioteca de Anuncios de Meta sí abre sin cuenta.</p>
+  <div class="tbl" style="margin-bottom:18px"><table id="mon"></table></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:16px">Rutina sugerida</h3>
+      <ul style="margin:0;padding-left:18px;font-size:14px">
+        <li><b>Lunes:</b> revisar la Biblioteca de Anuncios de cada competidor y registrar las promos nuevas en el Muro.</li>
+        <li><b>Diario:</b> asesores registran afiches, volantes y perifoneo en campo (distrito + foto).</li>
+        <li><b>Quincenal:</b> cliente incógnito por WhatsApp a 2 competidores (instalación, permanencia, promo real).</li>
+        <li><b>Mensual:</b> revisar los reportes de OSIPTEL (Punku) de participación en Junín.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:16px">Fuentes oficiales</h3>
+      <ul style="margin:0;padding-left:18px;font-size:14px">
+        <li><a href="https://punku.osiptel.gob.pe/" target="_blank" rel="noopener">OSIPTEL · Punku</a> (estadísticas de internet fijo por departamento y empresa)</li>
+        <li><a href="https://www.checatuplan.pe/" target="_blank" rel="noopener">OSIPTEL · Checa tu plan</a> (tarifas registradas por empresa)</li>
+        <li><a href="https://adstransparency.google.com/?region=PE" target="_blank" rel="noopener">Google · Centro de Transparencia de Anuncios</a></li>
+        <li><a href="https://ads.tiktok.com/business/creativecenter/" target="_blank" rel="noopener">TikTok · Creative Center</a></li>
+      </ul>
+    </div>
+  </div>
+  <h2 style="margin-top:24px">Referencias de la investigación</h2>
+  <div class="card"><ol id="refs" style="margin:0;padding-left:20px;font-size:13px"></ol></div>
+</section>
+</main>
+
+<script>
+/* ============ DATOS DE INVESTIGACIÓN (línea base 10/11/2026) ============ */
+const FECHA_BASE = "2026-11-10";
+
+const REFS = {
+  osiptel25:{t:"El Peruano · OSIPTEL: conexiones de fibra fuera de Lima crecen más de 26% al cierre de 2025", u:"https://elperuano.pe/noticia/290843-osiptel-numero-de-conexiones-de-fibra-optica-fuera-de-lima-crece-mas-de-26-al-cierre-de-2025"},
+  clarowow:{t:"Gestión · América Móvil, dueña de Claro, acuerda compra de WOW en Perú (21/07/2026)", u:"https://gestion.pe/economia/empresas/america-movil-duena-de-claro-acuerda-compra-de-wow-en-peru-para-crecer-en-negocio-de-fibra-optica-noticia/"},
+  claro17:{t:"Gestión · Tras la compra de WOW, Claro alista su mayor despliegue de fibra (17/08/2026)", u:"https://gestion.pe/economia/empresas/tras-compra-de-wow-claro-acelera-despliegue-de-fibra-optica-con-5429-km-en-2026-noticia/"},
+  wowcentro:{t:"Revista Economía · WOW amplía cobertura de fibra en Huancayo y Cerro de Pasco (25/10/2023)", u:"https://www.revistaeconomia.com/?p=55518"},
+  wowfb:{t:"Facebook · Internet Wow Huancayo (página de venta; requiere iniciar sesión en Facebook)", u:"https://www.facebook.com/p/WOW-Huancayo-Internet-Fibra-optica-100095288843140/"},
+  wowweb:{t:"WOW Perú · Planes", u:"https://wowperu.pe/planes/"},
+  wowsel:{t:"Selectra · Planes de internet WOW", u:"https://selectra.com.pe/empresas/wow"},
+  winhyo:{t:"WIN · Internet fibra óptica en Huancayo", u:"https://win.pe/huancayo"},
+  winemp:{t:"WIN Empresas · Huancayo (anillo de fibra y distritos)", u:"https://winempresas.pe/huancayo"},
+  winsel:{t:"Selectra · Cobertura WIN en Perú", u:"https://selectra.com.pe/internet/internet-cobertura/win"},
+  movjun:{t:"Movistar · Fibra óptica en Junín", u:"https://www.movistar.com.pe/internet-fibra-optica-junin"},
+  movhyo:{t:"TelecomTalk · Telefónica amplía fibra en Cusco y Huancayo (18/01/2024)", u:"https://telecomtalk.info/telefonica-peru-expands-fiber-45000premises-cusco-huancayo/913891/"},
+  claroneg:{t:"Claro · Fibra óptica negocios (cobertura Junín)", u:"https://www.claro.com.pe/negocios/fijos/internet/fibra-optica-negocios/"},
+  clarolte:{t:"Claro · Zonas de cobertura LTE (Huancayo, Jauja, Chupaca)", u:"https://static.claro.com.pe/img/otros/Actualizacion-zonas-de-cobertura-LTE-al-2201.pdf"},
+  cablered:{t:"Cable Red · Web oficial", u:"https://cableredperu.com/"},
+  cableredyt:{t:"Cable Red · Canal de YouTube (historia y cobertura)", u:"https://www.youtube.com/channel/UCrs6jSTAFxouRva_FQ4BpuQ/about"},
+  cableredfb:{t:"Facebook · Cable Red Perú (requiere iniciar sesión en Facebook)", u:"https://www.facebook.com/cableredperu/"},
+  gigared:{t:"Gigared Centro · Planes", u:"https://gigaredcentro.com/home"},
+  prored:{t:"ProRed · Web oficial", u:"https://proredperu.com/"},
+  proredplanes:{t:"ProRed · Planes", u:"https://proredperu.com/planes/"},
+  proredn:{t:"ProRed · Nosotros", u:"https://proredperu.com/nosotros/"},
+  telecable:{t:"Selectra · Planes de Telecable (Junín)", u:"https://selectra.com.pe/empresas/telecable"},
+  selemp:{t:"Selectra · Empresas de telecomunicaciones en Perú 2026", u:"https://selectra.com.pe/empresas"},
+  bitel:{t:"Selectra · Cobertura Bitel Fibra", u:"https://selectra.com.pe/internet/internet-cobertura/bitel"},
+  mifibra:{t:"MiFibra · Coberturas", u:"https://mifibrahogar.com/cobertura/"},
+  waoo:{t:"Gestión · Waoo irá a competir al segmento corporativo en 2026", u:"https://gestion.pe/economia/empresas/internet-waoo-ira-a-competir-al-segmento-corporativo-en-2026-a-que-empresas-apunta-noticia/"},
+  fodp:{t:"Facebook · Fibra Óptica Del Perú (requiere iniciar sesión en Facebook)", u:"https://www.facebook.com/fibraopticadelperu/"},
+  speedc:{t:"SpeedCentro · Web oficial", u:"https://speedcentro.com/"},
+  fc:{t:"Fiber Centro · Web oficial", u:"https://www.fibercentro.com/"}
+};
+
+const DISTRICTS = [
+  {id:"huancayo",  n:"Huancayo",        prov:"Huancayo",  lat:-12.080, lon:-75.205, fc:true},
+  {id:"eltambo",   n:"El Tambo",        prov:"Huancayo",  lat:-12.046, lon:-75.228, fc:true},
+  {id:"hualahoyo", n:"Hualahoyo",       prov:"Huancayo (El Tambo)", lat:-12.020, lon:-75.250, fc:false},
+  {id:"cajas",     n:"San Agustín de Cajas", prov:"Huancayo", lat:-12.000, lon:-75.244, fc:true},
+  {id:"hualhuas",  n:"Hualhuas",        prov:"Huancayo",  lat:-11.976, lon:-75.252, fc:true},
+  {id:"quilcas",   n:"Quilcas",         prov:"Huancayo",  lat:-11.938, lon:-75.250, fc:false},
+  {id:"sanjeronimo", n:"San Jerónimo de Tunán", prov:"Huancayo", lat:-11.957, lon:-75.285, fc:true},
+  {id:"concepcion",n:"Concepción",      prov:"Concepción",lat:-11.918, lon:-75.313, fc:true},
+  {id:"matahuasi", n:"Matahuasi",       prov:"Concepción",lat:-11.890, lon:-75.345, fc:false},
+  {id:"sanlorenzo",n:"San Lorenzo",     prov:"Jauja",     lat:-11.850, lon:-75.385, fc:false},
+  {id:"mantaro",   n:"Mantaro",         prov:"Jauja",     lat:-11.822, lon:-75.398, fc:false},
+  {id:"yanamuclo", n:"Yanamuclo",       prov:"Jauja",     lat:-11.805, lon:-75.425, fc:false},
+  {id:"jauja",     n:"Jauja",           prov:"Jauja",     lat:-11.776, lon:-75.497, fc:true}
+];
+
+/* presencia: c = confirmado, p = publicidad/provincia (por verificar) */
+const COMPS = [
+  {id:"wow", n:"WOW (en proceso de compra por Claro)", short:"WOW", tipo:"nac", color:"#7c3aed", tech:"FTTH 100% fibra",
+   resumen:"Líder de fibra en Junín. Una página de venta en Facebook anuncia cobertura en casi todos tus distritos objetivo.",
+   hechos:[
+     ["Tenía el 46.13% de la fibra en Junín al cierre de 2025 (OSIPTEL).","osiptel25"],
+     ["América Móvil (Claro) acordó comprar el 100% de WOW en julio de 2026; la operación aún requiere aprobación.","clarowow"],
+     ["Cobertura declarada en 2023: Huancayo, El Tambo, Chilca, Huancán y Sapallanga.","wowcentro"],
+     ["La página 'Internet Wow Huancayo' anuncia Concepción, San Jerónimo, Quilcas, Hualhuas, Matahuasi, Mantaro, San Lorenzo, Cajas y Jauja, con 1000 Mbps a S/ 74.90 sin costo de instalación.","wowfb"]
+   ],
+   pres:{huancayo:"c",eltambo:"c",cajas:"p",hualhuas:"p",quilcas:"p",sanjeronimo:"p",concepcion:"p",matahuasi:"p",sanlorenzo:"p",mantaro:"p",jauja:"p"},
+   fb:"https://www.facebook.com/p/WOW-Huancayo-Internet-Fibra-optica-100095288843140/", web:"https://wowperu.pe/", adq:"WOW Peru", asesores:true},
+  {id:"movistar", n:"Movistar", short:"Movistar", tipo:"nac", color:"#0ea5e9", tech:"FTTH (migración desde HFC)",
+   resumen:"Fibra en Huancayo y El Tambo. Declara cobertura en las 9 provincias de Junín, incluidas Concepción y Jauja.",
+   hechos:[
+     ["En 2024 tenía más de 24 mil hogares con fibra en Huancayo (Huancayo y El Tambo), con meta de 84 mil.","movhyo"],
+     ["Declara fibra en las provincias de Concepción, Huancayo y Jauja, entre otras; no publica la lista de distritos.","movjun"],
+     ["En Junín: desde S/ 59.90 (100 Mbps), 400 Mbps a S/ 69.90 con instalación gratis y bono de 1000 Mbps, y 1000 Mbps a S/ 149.90.","movjun"]
+   ],
+   pres:{huancayo:"c",eltambo:"c",concepcion:"p",jauja:"p"},
+   fb:"", web:"https://www.movistar.com.pe/internet-fibra-optica-junin", adq:"Movistar Perú", asesores:true},
+  {id:"claro", n:"Claro", short:"Claro", tipo:"nac", color:"#dc2626", tech:"FTTH + inalámbrico LTE",
+   resumen:"Tiene fibra en Junín e internet inalámbrico en Huancayo y Jauja. Si se aprueba la compra de WOW, sería el actor dominante.",
+   hechos:[
+     ["Fibra para negocios en algunos distritos de Junín (sujeto a cobertura).","claroneg"],
+     ["Internet fijo inalámbrico LTE en Huancayo, Jauja y Chupaca.","clarolte"],
+     ["Comprador de WOW (julio de 2026), sujeto a aprobación; anunció su mayor despliegue de fibra en 2026.","claro17"]
+   ],
+   pres:{huancayo:"p",jauja:"p"},
+   fb:"", web:"https://www.claro.com.pe/personas/hogar/internet/", adq:"Claro Perú", asesores:true, pendiente:"Falta precio de los planes de hogar en Huancayo: hay que verificarlo con el cliente incógnito."},
+  {id:"win", n:"WIN", short:"WIN", tipo:"nac", color:"#ea580c", tech:"FTTH simétrico",
+   resumen:"Llegó a Huancayo con promos agresivas de 50% por 3 meses y bonos de velocidad a 1000 Mbps.",
+   hechos:[
+     ["Hogar: casco urbano de Huancayo y El Tambo (despliegue inicial).","winsel"],
+     ["WIN Empresas tiene un anillo de 300 km y nodos en Huancayo, El Tambo, Chilca, Chupaca y Pilcomayo.","winemp"],
+     ["350 Mbps a S/ 39.50 por 3 meses (regular S/ 79); los planes con TV incluyen bono de 1000 Mbps por 6 meses.","winhyo"]
+   ],
+   pres:{huancayo:"c",eltambo:"c"},
+   fb:"", web:"https://win.pe/huancayo", adq:"WIN Perú", asesores:true},
+  {id:"cablered", n:"Cable Red (Red Intercable Perú)", short:"Cable Red", tipo:"reg", color:"#be123c", tech:"HFC + FTTH",
+   resumen:"Cableoperador local desde 2008. Vende internet con su TV propia (Cable Red Go, con L1MAX y Liga 1).",
+   hechos:[
+     ["Opera desde 2008 y cubre en torno al 60% de Huancayo, El Tambo y Chilca; también está en Huancavelica.","cableredyt"],
+     ["Oficinas en Av. Huancavelica 838 (Huancayo) y Av. Progreso 595 (El Tambo). Unos 8.4 mil seguidores en Facebook.","cableredfb"],
+     ["300 Mbps de fibra desde S/ 50; 300 Mbps con TV a S/ 80; anuncia planes de 500 y 1000 Mbps sin publicar precio.","cablered"]
+   ],
+   pres:{huancayo:"c",eltambo:"c"},
+   fb:"https://www.facebook.com/cableredperu/", web:"https://cableredperu.com/", adq:"Cable Red Perú", asesores:true},
+  {id:"gigared", n:"Gigared Centro", short:"Gigared", tipo:"reg", color:"#2563eb", tech:"FTTH simétrico",
+   resumen:"Es el que pelea más fuerte en precio: 50% de descuento por 3 meses y 1000 Mbps a S/ 50 de promo.",
+   hechos:[
+     ["Base en Saños Grande, El Tambo; dice operar en Huancayo y El Tambo y en '+15 zonas conectadas'.","gigared"],
+     ["300/600/800/1000 Mbps a S/ 25/35/45/50 por 3 meses (regular S/ 50/70/90/100). Instalación gratis.","gigared"],
+     ["Vende 'sin cobros ocultos': no cobra reconexión, visitas técnicas ni traslado de punto.","gigared"]
+   ],
+   pres:{huancayo:"c",eltambo:"c"},
+   fb:"https://www.facebook.com/InternetGIGARED", web:"https://gigaredcentro.com/", adq:"GIGARED", asesores:true},
+  {id:"prored", n:"ProRed", short:"ProRed", tipo:"reg", color:"#0f766e", tech:"FTTH simétrico",
+   resumen:"Operador del corredor Huancayo–Concepción. Se está expandiendo justo a tus zonas del norte.",
+   hechos:[
+     ["Fundada en 2014; dice tener más de 5,000 clientes.","proredn"],
+     ["Anuncia que ya está disponible en Apata, Concepción y San Jerónimo.","prored"],
+     ["Hay dos tarifarios distintos en su web: 150/250/450/650 Mbps a S/ 50/70/90/100, o 300/600 Mbps a S/ 50/70.","proredplanes"]
+   ],
+   pres:{huancayo:"c",concepcion:"c",sanjeronimo:"c"},
+   fb:"https://www.facebook.com/fibraoptica.prored", web:"https://proredperu.com/", adq:"PRORED", asesores:true},
+  {id:"intercab", n:"Intercab", short:"Intercab", tipo:"pend", color:"#64748b", tech:"Por confirmar",
+   resumen:"La investigación en internet no encontró su web, redes ni planes. Por ahora solo se sabe que tus asesores vieron sus afiches.",
+   hechos:[["Validar en campo: nombre legal, fanpage, número de WhatsApp y planes del afiche.",null]],
+   pres:{}, fb:"", web:"", adq:"Intercab", asesores:true, pendiente:"Prioridad: conseguir su fanpage o su número de WhatsApp para monitorearlo."},
+  {id:"megaspeed", n:"Mega Speed", short:"Mega Speed", tipo:"pend", color:"#64748b", tech:"Por confirmar",
+   resumen:"No se encontró presencia en internet en Junín. Solo hay detección en campo por tus asesores.",
+   hechos:[["Validar en campo: zona, fanpage, WhatsApp y precios.",null]],
+   pres:{}, fb:"", web:"", adq:"Mega Speed", asesores:true, pendiente:"Prioridad: identificar en qué distrito pone afiches."},
+  {id:"telecable", n:"Telecable (Junín)", short:"Telecable", tipo:"reg", color:"#a16207", tech:"FTTH + cable",
+   resumen:"No estaba en tu lista. Es un operador regional con oficinas en Jauja, Huancayo y La Oroya, y mantiene su precio por 12 meses.",
+   hechos:[
+     ["Oficinas en Jauja, Huancayo y La Oroya; no publica la lista de distritos.","telecable"],
+     ["400/600/800/1000 Mbps a S/ 59/69/79/109 durante 12 meses; sube S/ 10 desde el mes 13. La TV cuesta S/ 20 más.","telecable"]
+   ],
+   pres:{jauja:"c",huancayo:"c"},
+   fb:"", web:"", adq:"Telecable", asesores:false},
+  {id:"bitel", n:"Bitel Fibra", short:"Bitel", tipo:"nac", color:"#0891b2", tech:"FTTH",
+   resumen:"No estaba en tu lista. Tiene fibra operativa en Huancayo desde 2024, con el precio de entrada más bajo del país.",
+   hechos:[["Fibra en Huancayo, El Tambo y Chilca (lista de 2023-2024); precio de oferta desde S/ 55 al mes.","bitel"]],
+   pres:{huancayo:"c",eltambo:"c"}, fb:"", web:"", adq:"Bitel", asesores:false},
+  {id:"fodp", n:"Fibra Óptica Del Perú", short:"FO del Perú", tipo:"reg", color:"#4d7c0f", tech:"FTTH",
+   resumen:"No estaba en tu lista. Fanpage con unos 8.8 mil seguidores que anuncia cobertura en Huancayo, Junín y Tarma.",
+   hechos:[["Dice tener cobertura en todo Huancayo, Junín y Tarma.","fodp"]],
+   pres:{huancayo:"p"}, fb:"https://www.facebook.com/fibraopticadelperu/", web:"", adq:"Fibra Óptica Del Perú", asesores:false}
+];
+
+const WATCH = [
+  {n:"MiFibra", txt:"Dice estar 'pronto en Cusco y Junín'.", ref:"mifibra"},
+  {n:"Waoo", txt:"Plan de expansión a Huancayo en 2026.", ref:"waoo"},
+  {n:"SpeedCentro", txt:"Opera en Chilca, Huancán, Huarivilca y 3 de Diciembre (al sur de tus zonas).", ref:"speedc"}
+];
+
+/* ofertas base: v = Mbps, p = promo, r = regular */
+const BASE_OFFERS = [
+  {c:"wow", plan:"1000 Mbps (página de venta en Huancayo)", v:1000, p:74.90, r:null, dur:"", canal:"fb", d:"", nota:"Sin costo de instalación. Anuncia los distritos de Concepción a Jauja. No se ve la fecha del post.", ref:"wowfb"},
+  {c:"wow", plan:"500 Mbps con bono a 1000 Mbps x 12 meses + DGO", v:500, p:79.90, r:89.90, dur:"6 meses con pago puntual", canal:"web", d:"", nota:"Tarifa nacional de la web; confirmar en Huancayo.", ref:"wowweb", tv:true, nacional:true},
+  {c:"wow", plan:"1000 Mbps + DGO", v:1000, p:94.90, r:104.90, dur:"6 meses con pago puntual", canal:"web", d:"", nota:"Tarifa nacional de la web.", ref:"wowweb", tv:true, nacional:true},
+  {c:"win", plan:"350 Mbps + FONOWIN", v:350, p:39.50, r:79, dur:"3 meses", canal:"web", d:"", nota:"Incluye teléfono fijo. Velocidad mínima garantizada del 70%.", ref:"winhyo"},
+  {c:"win", plan:"550 Mbps + WINTV Premium", v:550, p:44.95, r:89.90, dur:"3 meses", canal:"web", d:"", nota:"Bono a 1000 Mbps por 6 meses y más de 80 canales.", ref:"winhyo", tv:true},
+  {c:"win", plan:"750 Mbps + WINTV Premium", v:750, p:49.95, r:99.90, dur:"3 meses", canal:"web", d:"", nota:"Bono a 1000 Mbps por 6 meses.", ref:"winhyo", tv:true},
+  {c:"win", plan:"1000 Mbps + WINTV L1MAX", v:1000, p:64.95, r:129.90, dur:"3 meses", canal:"web", d:"", nota:"Incluye L1MAX (fútbol local) y 2 mesh a solicitud.", ref:"winhyo", tv:true},
+  {c:"movistar", plan:"Fibra 100 Mbps", v:100, p:null, r:59.90, dur:"", canal:"web", d:"", nota:"Precio de entrada en Junín.", ref:"movjun"},
+  {c:"movistar", plan:"Fibra 400 Mbps", v:400, p:69.90, r:null, dur:"", canal:"web", d:"", nota:"Instalación gratis y bono de 1000 Mbps.", ref:"movjun"},
+  {c:"movistar", plan:"Fibra 1000 Mbps", v:1000, p:null, r:149.90, dur:"", canal:"web", d:"", nota:"Plan tope en Junín.", ref:"movjun"},
+  {c:"cablered", plan:"Internet fibra 300 Mbps", v:300, p:null, r:50, dur:"", canal:"web", d:"", nota:"Anuncia 300/500/1000 Mbps; solo publica el precio del de 300.", ref:"cablered"},
+  {c:"cablered", plan:"300 Mbps + Cable Red Go", v:300, p:null, r:80, dur:"", canal:"web", d:"", nota:"Incluye TV con L1MAX y Liga 1.", ref:"cablered", tv:true},
+  {c:"cablered", plan:"Cable Red Go (solo TV)", v:0, p:39.90, r:50, dur:"3 meses", canal:"web", d:"", nota:"Más de 100 canales y 5 perfiles.", ref:"cablered", tv:true},
+  {c:"gigared", plan:"Plan 1 · 300 Mbps", v:300, p:25, r:50, dur:"3 meses", canal:"web", d:"", nota:"Instalación gratis; velocidad simétrica.", ref:"gigared"},
+  {c:"gigared", plan:"Plan 2 · 600 Mbps", v:600, p:35, r:70, dur:"3 meses", canal:"web", d:"", nota:"Router Wi-Fi 6.", ref:"gigared"},
+  {c:"gigared", plan:"Plan 3 · 800 Mbps", v:800, p:45, r:90, dur:"3 meses", canal:"web", d:"", nota:"Router Wi-Fi 6.", ref:"gigared"},
+  {c:"gigared", plan:"Plan 4 · 1000 Mbps", v:1000, p:50, r:100, dur:"3 meses", canal:"web", d:"", nota:"Precio promo más bajo del mercado para 1 Gbps.", ref:"gigared"},
+  {c:"prored", plan:"Plan Inicial 150 Mbps", v:150, p:null, r:50, dur:"", canal:"web", d:"", nota:"Instalación gratis. La portada dice 300 Mbps al mismo precio.", ref:"proredplanes"},
+  {c:"prored", plan:"Plan Hogar 250 Mbps", v:250, p:null, r:70, dur:"", canal:"web", d:"", nota:"La portada dice 600 Mbps a S/ 70.", ref:"proredplanes"},
+  {c:"prored", plan:"Plan Premium 450 Mbps", v:450, p:null, r:90, dur:"", canal:"web", d:"", nota:"", ref:"proredplanes"},
+  {c:"prored", plan:"Plan Máximo 650 Mbps", v:650, p:null, r:100, dur:"", canal:"web", d:"", nota:"", ref:"proredplanes"},
+  {c:"telecable", plan:"Fibra 400 Mbps", v:400, p:59, r:69, dur:"12 meses", canal:"web", d:"", nota:"La instalación no está incluida en el precio.", ref:"telecable"},
+  {c:"telecable", plan:"Fibra 600 Mbps", v:600, p:69, r:79, dur:"12 meses", canal:"web", d:"", nota:"", ref:"telecable"},
+  {c:"telecable", plan:"Fibra 800 Mbps", v:800, p:79, r:89, dur:"12 meses", canal:"web", d:"", nota:"", ref:"telecable"},
+  {c:"telecable", plan:"Fibra 1 Gbps", v:1000, p:109, r:119, dur:"12 meses", canal:"web", d:"", nota:"", ref:"telecable"},
+  {c:"bitel", plan:"Fibra (entrada)", v:null, p:null, r:55, dur:"", canal:"web", d:"", nota:"Precio de entrada nacional; falta la velocidad en Huancayo.", ref:"bitel", nacional:true}
+];
+
+/* ============ ESTADO ============ */
+let captures = [];   // ofertas registradas por el equipo (db)
+let fcPlans = [];    // planes Fiber Centro (db)
+let db = null, dbReady = false, canWrite = true;
+let selDist = "concepcion";
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const soles = n => (n==null || n==="" || isNaN(n)) ? "—" : "S/ " + Number(n).toFixed(2);
+const compById = id => COMPS.find(c=>c.id===id);
+const distById = id => DISTRICTS.find(d=>d.id===id);
+const refLink = k => k && REFS[k] ? `<a href="${REFS[k].u}" target="_blank" rel="noopener">fuente</a>` : "";
+const safeUrl = u => /^https?:\/\//i.test(u||"") ? u : "";
+
+/* presencia efectiva = base + capturas de campo */
+function presence(compId, distId){
+  const c = compById(compId); const base = c?.pres?.[distId];
+  if (base === "c") return "c";
+  const field = captures.some(x => x.competidor===compId && x.distrito===distId);
+  if (field) return "a";
+  return base || "";
+}
+function compsIn(distId){ return COMPS.filter(c => presence(c.id, distId)); }
+
+/* ============ NAVEGACIÓN ============ */
+const VIEWS = ["resumen","graficos","mapa","competidores","ofertas","comparador","fuentes"];
+function route(){
+  const h = (location.hash||"").replace("#","");
+  const v = VIEWS.includes(h) ? h : "resumen";
+  VIEWS.forEach(x => { $("#s-"+x).classList.toggle("on", x===v); });
+  document.querySelectorAll("#nav a").forEach(a => a.classList.toggle("on", a.getAttribute("href")==="#"+v));
+}
+window.addEventListener("hashchange", route);
+
+/* ============ RESUMEN ============ */
+function renderResumen(){
+  const nComp = COMPS.length;
+  const promos = BASE_OFFERS.filter(o=>o.p!=null).length + captures.filter(o=>o.precioPromo).length;
+  const g1000 = BASE_OFFERS.filter(o=>o.v>=1000 && o.p!=null && !o.tv);
+  const min1000 = Math.min(...g1000.map(o=>o.p));
+  const objetivo = DISTRICTS.length;
+  $("#kpis").innerHTML = `
+    <div class="card kpi"><div class="n">${nComp}</div><div class="l">Competidores mapeados</div><div class="s">9 de tu lista y 3 nuevos encontrados en la investigación</div></div>
+    <div class="card kpi"><div class="n">46.13%</div><div class="l">Participación de WOW en la fibra de Junín</div><div class="s">OSIPTEL, cierre de 2025 · ${refLink("osiptel25")}</div></div>
+    <div class="card kpi"><div class="n">${soles(min1000)}</div><div class="l">1000 Mbps más barato (promo, solo internet)</div><div class="s">Gigared, por 3 meses · ${refLink("gigared")}</div></div>
+    <div class="card kpi"><div class="n">${promos}</div><div class="l">Promos registradas</div><div class="s">Línea base + capturas del equipo (${captures.length})</div></div>`;
+  const A = [
+    {t:"WOW ataca tu corredor de Concepción a Jauja", p:"Una página de venta de WOW anuncia 1000 Mbps a S/ 74.90 sin instalación en 11 de tus 13 distritos objetivo, incluidos Quilcas, Matahuasi, Mantaro y San Lorenzo. WOW ya es líder en Junín. Conviene confirmar en campo si de verdad instala ahí o si solo es publicidad de un vendedor.", r:"wowfb"},
+    {t:"Claro + WOW: se viene un gigante", p:"América Móvil acordó comprar WOW en julio de 2026 y la operación está pendiente de aprobación. Si se cierra, Claro sumaría el líder de fibra de la región. Puedes aprovechar la transición en la comunicación: 'empresa local, atención local'.", r:"clarowow"},
+    {t:"Guerra de 50% por 3 meses", p:"Gigared (1000 Mbps a S/ 50) y WIN (350 Mbps a S/ 39.50) usan el mismo esquema: mitad de precio por 3 meses. Después de esos 3 meses, el precio regular de Gigared (S/ 100 por 1 Gbps) queda a la par del resto. Es una ventana para captar clientes cuando les sube el precio.", r:"gigared"},
+    {t:"ProRed entra a San Jerónimo y Concepción", p:"ProRed anuncia que ya está disponible en Apata, Concepción y San Jerónimo, que son distritos donde Fiber Centro declara cobertura. Es un competidor directo, local y con más de 10 años en el mercado.", r:"prored"},
+    {t:"Telecable mantiene su precio por 12 meses en Jauja", p:"Su promo dura un año (400 Mbps a S/ 59), no 3 meses. Es un argumento fuerte contra las promos cortas. Hay que vigilarlo en Jauja, donde tiene oficina.", r:"telecable", i:true},
+    {t:"Entrantes en el radar", p:"MiFibra anuncia que llegará 'pronto' a Junín, Waoo planea entrar a Huancayo en 2026 y Bitel ya tiene fibra en Huancayo desde 2024. Conviene vigilar sus primeros anuncios.", r:"mifibra", i:true}
+  ];
+  $("#alerts").innerHTML = A.map(a=>`<div class="card alert ${a.i?'i':''}"><h4>${esc(a.t)}</h4><p>${esc(a.p)}</p><div class="src" style="margin-top:6px">${refLink(a.r)}</div></div>`).join("");
+}
+
+/* ============ MAPA ============ */
+function proj(d){
+  const x = 30 + (d.lon - (-75.53)) / (0.36) * 330;
+  const y = 30 + (d.lat - (-11.75)) / (-0.34) * 580;
+  return [x,y];
+}
+function renderMap(){
+  const svg = $("#map");
+  // río Mantaro aproximado (pasa por el oeste del valle)
+  const river = [[-75.52,-11.78],[-75.47,-11.80],[-75.42,-11.84],[-75.38,-11.88],[-75.35,-11.93],[-75.31,-11.97],[-75.27,-12.02],[-75.25,-12.06],[-75.23,-12.09]]
+    .map(([lo,la])=>proj({lon:lo,lat:la}));
+  let s = `<rect x="0" y="0" width="560" height="640" rx="12" fill="#f3f7f4"/>`;
+  s += `<path d="M${river.map(p=>p.join(",")).join(" L")}" fill="none" stroke="#9cc9e8" stroke-width="8" stroke-linecap="round" opacity=".7"/>`;
+  s += `<text x="${river[3][0]-70}" y="${river[3][1]+4}" font-size="11" fill="#5b8db1" font-style="italic">Río Mantaro</text>`;
+  // provincia labels
+  s += `<text x="440" y="60" font-size="12" fill="#9aa59e" font-weight="700">JAUJA</text>`;
+  s += `<text x="440" y="300" font-size="12" fill="#9aa59e" font-weight="700">CONCEPCIÓN</text>`;
+  s += `<text x="440" y="620" font-size="12" fill="#9aa59e" font-weight="700">HUANCAYO</text>`;
+  DISTRICTS.forEach(d=>{
+    const [x,y] = proj(d); const n = compsIn(d.id).length;
+    const r = 14 + n*1.6;
+    s += `<g class="dist ${d.id===selDist?'sel':''}" data-id="${d.id}" tabindex="0">
+      <circle class="dot" cx="${x}" cy="${y}" r="${r}" fill="${d.fc?'#139a4b':'#cbd5ce'}" fill-opacity="${d.fc?.9:.95}" stroke="#fff" stroke-width="2"/>
+      <text x="${x}" y="${y+4}" text-anchor="middle" font-size="12" font-weight="800" fill="${d.fc?'#fff':'#334139'}">${n}</text>
+      <text x="${x+r+6}" y="${y+4}" font-size="12" font-weight="600" fill="#15211a">${esc(d.n)}</text>
+    </g>`;
+  });
+  svg.innerHTML = s;
+  svg.querySelectorAll(".dist").forEach(g=>{
+    const pick = ()=>{ selDist = g.dataset.id; renderMap(); renderDistPanel(); };
+    g.addEventListener("click", pick);
+    g.addEventListener("keydown", e=>{ if(e.key==="Enter") pick(); });
+  });
+}
+function renderDistPanel(){
+  const d = distById(selDist); const cs = compsIn(d.id);
+  const lv = {c:"Confirmado",p:"Publicidad / por verificar",a:"Detectado en campo"};
+  const offs = captures.filter(x=>x.distrito===d.id);
+  $("#distPanel").innerHTML = `
+    <h3 style="margin:0">${esc(d.n)}</h3>
+    <div class="src">${esc(d.prov)} · ${d.fc?'<span class="tag reg">Cobertura Fiber Centro</span>':'<span class="tag">Zona objetivo</span>'}</div>
+    <p style="margin:12px 0 6px;font-weight:700">${cs.length} competidor(es) detectado(s)</p>
+    ${cs.length? `<table>${cs.map(c=>{const l=presence(c.id,d.id);return `<tr><td><span class="lvl l-${l}">${l==='c'?'✓':l==='p'?'P':'C'}</span></td><td><b>${esc(c.short)}</b><div class="src">${lv[l]} · ${esc(c.tech)}</div></td></tr>`}).join("")}</table>`
+      : `<p class="note">No hay datos públicos para este distrito. Pide a tus asesores registrar lo que vean en campo.</p>`}
+    <p class="note" style="margin-top:10px">Además, tus asesores reportaron afiches de Intercab y Mega Speed en tus zonas de cobertura, pero sin precisar el distrito.</p>
+    ${offs.length? `<p style="font-weight:700;margin:10px 0 4px">Capturas del equipo aquí</p>${offs.slice(0,5).map(o=>`<div class="src">• ${esc(compById(o.competidor)?.short||o.competidor)}: ${esc(o.plan||'')} ${o.velocidad?esc(o.velocidad)+' Mbps':''} ${o.precioPromo?soles(o.precioPromo):''} (${esc(o.fecha||'')})</div>`).join("")}`:""}
+    <div style="margin-top:12px"><a href="#ofertas">Registrar una oferta en este distrito →</a></div>`;
+}
+function renderMatrix(){
+  const head = `<tr><th>Competidor</th>${DISTRICTS.map(d=>`<th style="text-align:center;font-size:10px;min-width:58px">${esc(d.n)}</th>`).join("")}</tr>`;
+  const fc = `<tr class="fc-row"><td>Fiber Centro</td>${DISTRICTS.map(d=>`<td style="text-align:center">${d.fc?'<span class="lvl l-c">✓</span>':'<span class="lvl l-n">·</span>'}</td>`).join("")}</tr>`;
+  const rows = COMPS.map(c=>`<tr><td><b>${esc(c.short)}</b></td>${DISTRICTS.map(d=>{const l=presence(c.id,d.id);return `<td style="text-align:center"><span class="lvl l-${l||'n'}">${l==='c'?'✓':l==='p'?'P':l==='a'?'C':'·'}</span></td>`}).join("")}</tr>`).join("");
+  $("#matrix").innerHTML = head + fc + rows;
+}
+
+/* ============ COMPETIDORES ============ */
+function renderComps(){
+  const f = $("#fTipo").value;
+  const list = COMPS.filter(c=>!f || c.tipo===f);
+  const tipoTag = {nac:'<span class="tag nac">Nacional</span>',reg:'<span class="tag reg">Regional</span>',pend:'<span class="tag pend">Por investigar</span>'};
+  $("#comps").innerHTML = list.map(c=>{
+    const ds = DISTRICTS.filter(d=>presence(c.id,d.id)).map(d=>d.n);
+    const nOff = BASE_OFFERS.filter(o=>o.c===c.id).length + captures.filter(o=>o.competidor===c.id).length;
+    return `<div class="card comp-card">
+      <div class="row" style="justify-content:space-between"><h3><span class="dot" style="background:${c.color}"></span>${esc(c.n)}</h3><div>${tipoTag[c.tipo]}${c.asesores?'<span class="tag">Afiches detectados por asesores</span>':'<span class="tag">Nuevo</span>'}</div></div>
+      <div class="src" style="margin-top:2px">${esc(c.tech)} · ${nOff} oferta(s) registradas</div>
+      <p style="margin:8px 0 0;font-size:14px">${esc(c.resumen)}</p>
+      <ul>${c.hechos.map(h=>`<li>${esc(h[0])} ${h[1]?`<span class="src">(${refLink(h[1])})</span>`:''}</li>`).join("")}</ul>
+      ${c.pendiente?`<p class="note" style="margin:8px 0 0">⚠️ ${esc(c.pendiente)}</p>`:''}
+      <div class="src" style="margin-top:8px"><b>Distritos:</b> ${ds.length?esc(ds.join(", ")):"sin datos"}</div>
+      <div class="row" style="margin-top:8px;font-size:13px">
+        ${c.web?`<a href="${c.web}" target="_blank" rel="noopener">Web</a>`:''}
+        ${c.fb?`<a href="${c.fb}" target="_blank" rel="noopener">Facebook</a>`:''}
+        <a href="${adLib(c.adq)}" target="_blank" rel="noopener">Anuncios activos (Meta)</a>
+      </div>
+    </div>`;
+  }).join("") + (f===""||f==="pend" ? `<div class="card"><h3 style="margin:0 0 6px;font-size:16px">👀 En observación</h3><ul style="margin:0;padding-left:18px;font-size:14px">${WATCH.map(w=>`<li><b>${esc(w.n)}:</b> ${esc(w.txt)} <span class="src">(${refLink(w.ref)})</span></li>`).join("")}</ul></div>`:"");
+}
+const adLib = q => "https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=PE&q=" + encodeURIComponent(q);
+
+/* ============ OFERTAS ============ */
+function allOffers(){
+  const base = BASE_OFFERS.map(o=>({src:"base", competidor:o.c, distrito:"", plan:o.plan, velocidad:o.v, precioPromo:o.p, precioRegular:o.r, duracion:o.dur, canal:o.canal, fecha:FECHA_BASE, nota:o.nota, ref:o.ref, tv:o.tv, nacional:o.nacional}));
+  const cap = captures.map(o=>({...o, src:"equipo"}));
+  return [...cap, ...base];
+}
+function renderOffers(){
+  const fc=$("#oComp").value, fd=$("#oDist").value, fk=$("#oCanal").value;
+  const L = allOffers().filter(o=>(!fc||o.competidor===fc)&&(!fd||o.distrito===fd)&&(!fk||o.canal===fk));
+  $("#oCount").textContent = L.length + " oferta(s)";
+  const cn = {web:"Web",fb:"Redes",campo:"Campo",wa:"WhatsApp",otro:"Otro"};
+  $("#offers").innerHTML = L.map(o=>{
+    const c = compById(o.competidor); const d = o.distrito ? distById(o.distrito) : null;
+    const link = o.src==="base" ? refLink(o.ref) : (safeUrl(o.enlace)?`<a href="${esc(safeUrl(o.enlace))}" target="_blank" rel="noopener">enlace</a>`:"");
+    return `<div class="card offer">
+      <span class="dot" style="width:12px;height:12px;border-radius:50%;background:${c?.color||'#999'};margin-top:6px"></span>
+      <div>
+        <div><b>${esc(c?.short||o.competidor)}</b> · ${esc(o.plan||'Oferta')} ${o.velocidad?`· <b>${esc(o.velocidad)} Mbps</b>`:''} ${o.tv?'<span class="tag">+TV</span>':''} ${o.nacional?'<span class="tag">Ref. nacional</span>':''}</div>
+        <div class="src"><span class="badge b-${esc(o.canal)}">${cn[o.canal]||esc(o.canal)}</span> ${d?'📍 '+esc(d.n)+' · ':''}${esc(o.fecha||'')} ${o.src==='equipo'?'· registrado por '+esc(o.registradoPor||'equipo'):'· línea base'} ${link?'· '+link:''}</div>
+        ${o.nota?`<div style="font-size:14px;margin-top:4px">${esc(o.nota)}</div>`:''}
+        ${o.src==='equipo' && canWrite?`<div style="margin-top:6px"><button class="danger" data-del="${esc(o.id)}" style="padding:4px 10px;font-size:12px">Eliminar</button></div>`:''}
+      </div>
+      <div class="price">${o.precioPromo?soles(o.precioPromo):soles(o.precioRegular)}<small>${o.precioPromo?(o.duracion?esc(o.duracion):'promo')+(o.precioRegular?' · luego '+soles(o.precioRegular):''):'precio regular'}</small></div>
+    </div>`;
+  }).join("") || `<p class="note">No hay ofertas con esos filtros.</p>`;
+  document.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click", async ()=>{
+    if (b.dataset.armed!=="1"){ b.dataset.armed="1"; b.textContent="¿Confirmar?"; return; }
+    b.disabled=true;
+    try{ await db.collection("ofertas").doc(b.dataset.del).delete(); }catch(e){ b.textContent="No se pudo eliminar"; }
+  }));
+}
+function fillSelects(){
+  const co = COMPS.map(c=>`<option value="${c.id}">${esc(c.short)}</option>`).join("");
+  const dio = DISTRICTS.map(d=>`<option value="${d.id}">${esc(d.n)}</option>`).join("");
+  $("#capForm [name=competidor]").innerHTML = co;
+  $("#capForm [name=distrito]").innerHTML = `<option value="">(sin distrito)</option>` + dio;
+  $("#oComp").innerHTML += co; $("#oDist").innerHTML += dio;
+  $("#capForm [name=fecha]").value = new Date().toISOString().slice(0,10);
+}
+$("#capForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const st = $("#capStatus");
+  if (!db){ st.textContent = "No se pudo conectar a la base compartida. Intenta abrir la página desde claude.ai con tu sesión iniciada."; return; }
+  const f = new FormData(e.target); const o = {};
+  ["competidor","distrito","plan","duracion","canal","fecha","nota","registradoPor","enlace"].forEach(k=>o[k]=String(f.get(k)||"").slice(0,600));
+  ["velocidad","precioPromo","precioRegular"].forEach(k=>{const v=f.get(k); o[k]= v===""||v==null ? null : Number(v);});
+  if (!o.precioPromo && !o.precioRegular && !o.nota){ st.textContent="Agrega al menos un precio o un detalle."; return; }
+  o.creado = Date.now();
+  $("#capBtn").disabled = true; st.textContent = "Guardando…";
+  try{
+    await db.collection("ofertas").add(o);
+    st.textContent = "✓ Oferta guardada"; e.target.reset(); $("#capForm [name=fecha]").value = new Date().toISOString().slice(0,10);
+  }catch(err){
+    if (err && err.code==="invalid_argument"){ canWrite=false; st.textContent="Tu acceso es solo de lectura: pide al dueño que te dé permiso de Colaborador."; }
+    else if (err && err.code==="quota_exceeded"){ st.textContent="La base está llena: elimina ofertas antiguas."; }
+    else st.textContent = "No se pudo guardar. Intenta de nuevo.";
+  }finally{ $("#capBtn").disabled = false; }
+});
+
+/* ============ COMPARADOR ============ */
+function renderCmp(){
+  const band = $("#cBand").value, sort = $("#cSort").value;
+  let rows = allOffers().filter(o=>o.velocidad>0 && (o.precioRegular||o.precioPromo)).map(o=>{
+    const reg = o.precioRegular ?? o.precioPromo;
+    return {...o, short: compById(o.competidor)?.short||o.competidor, reg, p100: reg/o.velocidad*100};
+  });
+  fcPlans.forEach(p=>{ if(p.v>0) rows.push({short:"Fiber Centro", fc:true, plan:"Plan Fiber Centro", velocidad:p.v, precioPromo:p.p, precioRegular:p.r, reg:p.r??p.p, duracion:p.d, p100:(p.r??p.p)/p.v*100}); });
+  if (band){ const [a,b]=band.split("-").map(Number); rows = rows.filter(r=>r.velocidad>=a && r.velocidad<=b); }
+  rows.sort((x,y)=> sort==="reg" ? x.reg-y.reg : sort==="promo" ? ((x.precioPromo??x.reg)-(y.precioPromo??y.reg)) : x.p100-y.p100);
+  const maxP = Math.max(...rows.map(r=>r.p100), 1);
+  $("#cmp").innerHTML = `<tr><th>Operador</th><th>Plan</th><th class="num">Mbps</th><th class="num">Promo</th><th>Duración</th><th class="num">Regular</th><th class="num">S/ por 100 Mbps</th><th style="width:120px"></th></tr>` +
+    rows.map(r=>`<tr class="${r.fc?'fc-row':''}"><td><b>${esc(r.short)}</b>${r.src==='equipo'?' <span class="tag">campo</span>':''}</td><td>${esc(r.plan)} ${r.tv?'<span class="tag">+TV</span>':''}${r.nacional?' <span class="tag">nac.</span>':''}</td><td class="num">${r.velocidad}</td><td class="num">${soles(r.precioPromo)}</td><td>${esc(r.duracion||'')}</td><td class="num">${soles(r.precioRegular)}</td><td class="num"><b>${soles(r.p100)}</b></td><td><div class="bar"><i style="width:${(r.p100/maxP*100).toFixed(0)}%;background:${r.fc?'#139a4b':'#94a3b8'}"></i></div></td></tr>`).join("");
+}
+function renderFcPlans(){
+  $("#fcPlans").innerHTML = fcPlans.length ? `<table>${fcPlans.map((p,i)=>`<tr><td>${p.v} Mbps</td><td>promo ${soles(p.p)}</td><td>regular ${soles(p.r)}</td><td>${esc(p.d||'')}</td><td>${canWrite?`<button class="ghost" data-fcdel="${i}" style="padding:4px 10px;font-size:12px">Quitar</button>`:''}</td></tr>`).join("")}</table>` : `<p class="note">Todavía no hay planes cargados.</p>`;
+  document.querySelectorAll("[data-fcdel]").forEach(b=>b.addEventListener("click", ()=>{ const n=[...fcPlans]; n.splice(Number(b.dataset.fcdel),1); saveFc(n); }));
+}
+let fcSaving = false;
+async function saveFc(next){
+  const st=$("#fcStatus");
+  if(!db){ st.textContent="Sin conexión a la base compartida."; return; }
+  if(fcSaving) return; fcSaving = true; st.textContent="Guardando…";
+  try{ await db.doc("config/fibercentro").set({planes: next}); st.textContent="✓ Guardado"; }
+  catch(e){ st.textContent = e?.code==="invalid_argument" ? "Solo lectura." : "No se pudo guardar."; }
+  finally{ fcSaving=false; }
+}
+$("#fcAdd").addEventListener("click", ()=>{
+  const v=Number($("#fcV").value), p=$("#fcP").value, r=$("#fcR").value;
+  if(!v || (!p && !r)){ $("#fcStatus").textContent="Indica los Mbps y al menos un precio."; return; }
+  saveFc([...fcPlans, {v, p:p?Number(p):null, r:r?Number(r):null, d:$("#fcD").value.slice(0,60)}]);
+  ["#fcV","#fcP","#fcR","#fcD"].forEach(s=>$(s).value="");
+});
+
+/* ============ FUENTES ============ */
+function renderMon(){
+  $("#mon").innerHTML = `<tr><th>Competidor</th><th>Web</th><th>Facebook</th><th>Anuncios activos (Meta)</th><th>Google Ads</th></tr>` +
+    COMPS.map(c=>`<tr><td><b>${esc(c.short)}</b></td><td>${c.web?`<a href="${c.web}" target="_blank" rel="noopener">abrir</a>`:'<span class="muted">—</span>'}</td><td>${c.fb?`<a href="${c.fb}" target="_blank" rel="noopener">abrir</a>`:'<span class="muted">buscar</span>'}</td><td><a href="${adLib(c.adq)}" target="_blank" rel="noopener">ver anuncios</a></td><td><a href="https://adstransparency.google.com/?region=PE" target="_blank" rel="noopener">buscar</a></td></tr>`).join("");
+  $("#refs").innerHTML = Object.values(REFS).map(r=>`<li><a href="${r.u}" target="_blank" rel="noopener">${esc(r.t)}</a></li>`).join("");
+}
+
+
+/* ============ GRÁFICOS (SVG propio) ============ */
+const tip = document.getElementById("tip");
+function bindTips(root){
+  root.querySelectorAll("[data-tip]").forEach(el=>{
+    el.addEventListener("mousemove", e=>{ tip.innerHTML = el.dataset.tip; tip.style.display="block"; tip.style.left=(e.clientX+12)+"px"; tip.style.top=(e.clientY+12)+"px"; });
+    el.addEventListener("mouseleave", ()=>{ tip.style.display="none"; });
+  });
+}
+function hbar(el, rows, fmt, opts={}){
+  const W=520, lw=opts.lw||110, rh=26, H=rows.length*rh+24, max=Math.max(...rows.map(r=>r.v),1)*1.08, pw=W-lw-60;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(opts.label||'')}">`;
+  [0.25,0.5,0.75,1].forEach(t=>{const x=lw+pw*t; s+=`<line x1="${x}" x2="${x}" y1="0" y2="${H-20}" stroke="#eef2ef"/><text class="ax" x="${x}" y="${H-6}" text-anchor="middle">${fmt(max*t)}</text>`;});
+  rows.forEach((r,i)=>{const y=i*rh+4, w=Math.max(2,r.v/max*pw);
+    s+=`<text class="lab" x="${lw-8}" y="${y+14}" text-anchor="end" ${r.bold?'font-weight="800"':''}>${esc(r.k)}</text>
+      <rect x="${lw}" y="${y+3}" width="${w}" height="${rh-10}" rx="4" fill="${r.color}"/>
+      <text class="val" x="${lw+w+6}" y="${y+14}">${fmt(r.v)}</text>
+      <rect class="hit" x="0" y="${y}" width="${W}" height="${rh}" data-tip="${esc(r.tip||'')}"/>`;});
+  el.innerHTML = s+`</svg>`; bindTips(el);
+}
+function renderCharts(){
+  const offers = allOffers();
+  // 1. S/ por 100 Mbps (mejor de cada operador)
+  const best = {};
+  offers.filter(o=>o.velocidad>0 && (o.precioRegular||o.precioPromo)).forEach(o=>{
+    const reg=o.precioRegular??o.precioPromo, v=reg/o.velocidad*100, k=compById(o.competidor)?.short||o.competidor;
+    if(!best[k]||v<best[k].v) best[k]={k,v,tip:`<b>${esc(k)}</b><br>${esc(o.plan)} · ${o.velocidad} Mbps<br>Regular ${soles(reg)} → ${soles(v)} por 100 Mbps`};
+  });
+  fcPlans.forEach(p=>{const reg=p.r??p.p; if(!p.v||!reg) return; const v=reg/p.v*100; if(!best.FC||v<best.FC.v) best.FC={k:"Fiber Centro",v,bold:true,tip:`<b>Fiber Centro</b><br>${p.v} Mbps · ${soles(reg)}`};});
+  const r1 = Object.values(best).map(r=>({...r,color:r.k==="Fiber Centro"?"#139a4b":"#94a3b8"})).sort((a,b)=>a.v-b.v);
+  hbar($("#ch1"), r1, v=>"S/ "+v.toFixed(1), {label:"Precio por 100 Mbps"});
+  if(!fcPlans.length) $("#ch1").insertAdjacentHTML("beforeend",`<p class="note">Carga tus planes en el Comparador para que Fiber Centro aparezca en verde.</p>`);
+
+  // 2. Dumbbell 1 Gbps
+  const g = offers.filter(o=>o.velocidad>=1000 && o.precioPromo && o.precioRegular);
+  fcPlans.filter(p=>p.v>=1000&&p.p&&p.r).forEach(p=>g.push({competidor:"fc",plan:"Fiber Centro",precioPromo:p.p,precioRegular:p.r,duracion:p.d,fc:true}));
+  g.sort((a,b)=>a.precioRegular-b.precioRegular);
+  const W=520,lw=150,rh=30,H=g.length*rh+26,maxv=Math.max(...g.map(o=>o.precioRegular),1)*1.1,pw=W-lw-20,X=v=>lw+v/maxv*pw;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Promo vs regular 1 Gbps">`;
+  [0,50,100,150].filter(v=>v<=maxv).forEach(v=>{s+=`<line x1="${X(v)}" x2="${X(v)}" y1="0" y2="${H-20}" stroke="#eef2ef"/><text class="ax" x="${X(v)}" y="${H-6}" text-anchor="middle">S/ ${v}</text>`;});
+  g.forEach((o,i)=>{const y=i*rh+14, n=o.fc?"Fiber Centro":(compById(o.competidor)?.short||o.competidor);
+    const lab = n + (o.tv?" (+TV)":"");
+    s+=`<text class="lab" x="${lw-8}" y="${y+4}" text-anchor="end" ${o.fc?'font-weight="800"':''}>${esc(lab)}</text>
+     <line x1="${X(o.precioPromo)}" x2="${X(o.precioRegular)}" y1="${y}" y2="${y}" stroke="#cbd5ce" stroke-width="3"/>
+     <circle cx="${X(o.precioPromo)}" cy="${y}" r="6" fill="#eb6834" stroke="#fff" stroke-width="2"/>
+     <circle cx="${X(o.precioRegular)}" cy="${y}" r="6" fill="#2a78d6" stroke="#fff" stroke-width="2"/>
+     <rect class="hit" x="0" y="${y-rh/2}" width="${W}" height="${rh}" data-tip="<b>${esc(lab)}</b><br>${esc(o.plan)}<br>Promo ${soles(o.precioPromo)} (${esc(o.duracion||'—')})<br>Regular ${soles(o.precioRegular)} · sube ${Math.round((o.precioRegular/o.precioPromo-1)*100)}%"/>`;});
+  $("#ch2").innerHTML = g.length? s+`</svg>` : `<p class="note">Sin datos.</p>`; bindTips($("#ch2"));
+
+  // 3. Distritos
+  const r3 = DISTRICTS.map(d=>{const cs=compsIn(d.id);return {k:d.n,v:cs.length,color:d.fc?"#139a4b":"#a3b1a8",tip:`<b>${esc(d.n)}</b><br>${cs.map(c=>esc(c.short)).join(", ")||"Sin datos"}`};}).sort((a,b)=>b.v-a.v);
+  hbar($("#ch3"), r3, v=>String(Math.round(v)), {label:"Competidores por distrito", lw:160});
+
+  // 4. Actividad semanal
+  const now = Date.now(), wk=7*864e5, weeks=[...Array(12)].map((_,i)=>({start:now-(12-i)*wk,n:0,by:{}}));
+  captures.forEach(o=>{const t=o.fecha?Date.parse(o.fecha):o.creado; if(!t) return; const i=Math.floor((t-(now-12*wk))/wk); if(i>=0&&i<12){weeks[i].n++; const k=compById(o.competidor)?.short||o.competidor; weeks[i].by[k]=(weeks[i].by[k]||0)+1;}});
+  if(!captures.length){ $("#ch4").innerHTML=`<p class="note" style="padding:30px 0;text-align:center">Aún no hay registros. Este gráfico se llena cuando tu equipo registre ofertas o corra la actualización automática.</p>`; }
+  else{
+    const W4=520,H4=200,pw4=W4-40,bw=pw4/12-6,m=Math.max(...weeks.map(w=>w.n),1);
+    let t=`<svg viewBox="0 0 ${W4} ${H4}" width="100%" role="img" aria-label="Ofertas por semana">`;
+    weeks.forEach((w,i)=>{const h=w.n/m*(H4-50), x=30+i*(pw4/12), y=H4-28-h, d=new Date(w.start);
+      const lbl=d.getDate()+"/"+(d.getMonth()+1);
+      t+=`<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h,w.n?2:0)}" rx="4" fill="#139a4b"/>${w.n?`<text class="val" x="${x+bw/2}" y="${y-4}" text-anchor="middle">${w.n}</text>`:''}
+        <text class="ax" x="${x+bw/2}" y="${H4-12}" text-anchor="middle">${lbl}</text>
+        <rect class="hit" x="${x}" y="0" width="${bw}" height="${H4}" data-tip="<b>Semana del ${lbl}</b><br>${w.n} oferta(s)<br>${Object.entries(w.by).map(([k,v])=>esc(k)+': '+v).join('<br>')}"/>`;});
+    $("#ch4").innerHTML=t+`</svg>`; bindTips($("#ch4"));
+  }
+}
+
+/* ============ RENDER GLOBAL ============ */
+function renderAll(){ renderResumen(); renderMap(); renderDistPanel(); renderMatrix(); renderComps(); renderOffers(); renderCmp(); renderFcPlans(); renderCharts(); }
+$("#fTipo").addEventListener("change", renderComps);
+["#oComp","#oDist","#oCanal"].forEach(s=>$(s).addEventListener("change", renderOffers));
+["#cBand","#cSort"].forEach(s=>$(s).addEventListener("change", renderCmp));
+
+fillSelects(); renderMon(); renderAll(); route();
+
+/* ============ COPIA SIN CONEXIÓN (datos incluidos) ============ */
+const SNAP = {"ofertas": [{"canal": "web", "competidor": "telecable", "creado": 1794829092366, "distrito": "", "duracion": "12 meses (sube desde el mes 13)", "enlace": "https://selectra.com.pe/empresas/telecable", "fecha": "2026-11-16", "nota": "Fuente comparador (Selectra), confirmar con el operador. Con TV +S/20.", "plan": "Fibra 1000 Mbps", "precioPromo": 109, "precioRegular": 119, "registradoPor": "Monitoreo automático", "velocidad": 1000, "id": "auto-20261116-telecable-4"}, {"canal": "web", "competidor": "telecable", "creado": 1794829092365, "distrito": "", "duracion": "12 meses (sube desde el mes 13)", "enlace": "https://selectra.com.pe/empresas/telecable", "fecha": "2026-11-16", "nota": "Fuente comparador (Selectra), confirmar con el operador. Con TV +S/20.", "plan": "Fibra 800 Mbps", "precioPromo": 79, "precioRegular": 89, "registradoPor": "Monitoreo automático", "velocidad": 800, "id": "auto-20261116-telecable-3"}, {"canal": "web", "competidor": "telecable", "creado": 1794829092364, "distrito": "", "duracion": "12 meses (sube desde el mes 13)", "enlace": "https://selectra.com.pe/empresas/telecable", "fecha": "2026-11-16", "nota": "Fuente comparador (Selectra), confirmar con el operador. Con TV +S/20.", "plan": "Fibra 600 Mbps", "precioPromo": 69, "precioRegular": 79, "registradoPor": "Monitoreo automático", "velocidad": 600, "id": "auto-20261116-telecable-2"}, {"canal": "web", "competidor": "telecable", "creado": 1794829092363, "distrito": "", "duracion": "12 meses (sube desde el mes 13)", "enlace": "https://selectra.com.pe/empresas/telecable", "fecha": "2026-11-16", "nota": "Fuente comparador (Selectra), confirmar con el operador. Con TV +S/20. Oficinas en Jauja, Huancayo y La Oroya.", "plan": "Fibra 400 Mbps", "precioPromo": 59, "precioRegular": 69, "registradoPor": "Monitoreo automático", "velocidad": 400, "id": "auto-20261116-telecable-1"}, {"canal": "web", "competidor": "prored", "creado": 1794829092362, "distrito": "", "duracion": "Permanencia mínima 6 meses", "enlace": "https://proredperu.com/", "fecha": "2026-11-16", "nota": "'Best seller'. TV digital HD. Dúo 300: S/75; Dúo 1000: S/125.", "plan": "Dúo 600 Mbps + TV", "precioPromo": null, "precioRegular": 95, "registradoPor": "Monitoreo automático", "velocidad": 600, "id": "auto-20261116-prored-4"}, {"canal": "web", "competidor": "prored", "creado": 1794829092361, "distrito": "", "duracion": "Permanencia mínima 6 meses", "enlace": "https://proredperu.com/", "fecha": "2026-11-16", "nota": "Simétrico, instalación gratis, pago adelantado de una mensualidad.", "plan": "Máximo 1000 Mbps", "precioPromo": null, "precioRegular": 100, "registradoPor": "Monitoreo automático", "velocidad": 1000, "id": "auto-20261116-prored-3"}, {"canal": "web", "competidor": "prored", "creado": 1794829092360, "distrito": "", "duracion": "Permanencia mínima 6 meses", "enlace": "https://proredperu.com/", "fecha": "2026-11-16", "nota": "Plan 'popular'. Simétrico, instalación gratis, pago adelantado de una mensualidad.", "plan": "Hogar 600 Mbps", "precioPromo": null, "precioRegular": 70, "registradoPor": "Monitoreo automático", "velocidad": 600, "id": "auto-20261116-prored-2"}, {"canal": "web", "competidor": "prored", "creado": 1794829092359, "distrito": "", "duracion": "Permanencia mínima 6 meses", "enlace": "https://proredperu.com/", "fecha": "2026-11-16", "nota": "Simétrico, instalación gratis, pago adelantado de una mensualidad. Cobertura: Huancayo, Concepción, Apata, San Jerónimo.", "plan": "Inicial 300 Mbps", "precioPromo": null, "precioRegular": 50, "registradoPor": "Monitoreo automático", "velocidad": 300, "id": "auto-20261116-prored-1"}, {"canal": "web", "competidor": "cablered", "creado": 1794829092358, "distrito": "", "duracion": "No indicada", "enlace": "https://cableredperu.com/", "fecha": "2026-11-16", "nota": "Incluye +41 canales y 1 dispositivo Android. Con TV digital: S/80. Menciona planes de 500 y 1000 Mbps sin precio.", "plan": "Internet 300 Mbps con Cable Red Go", "precioPromo": null, "precioRegular": 50, "registradoPor": "Monitoreo automático", "velocidad": 300, "id": "auto-20261116-cablered-1"}, {"canal": "web", "competidor": "gigared", "creado": 1794829092357, "distrito": "", "duracion": "3 meses", "enlace": "https://gigaredcentro.com/home", "fecha": "2026-11-16", "nota": "Simétrico, router Wi-Fi 6, instalación gratis. Dúo 1000 Mbps + TV (hasta 2 TV) también a S/50.", "plan": "Plan 4 Solo Internet 1000 Mbps", "precioPromo": 50, "precioRegular": 100, "registradoPor": "Monitoreo automático", "velocidad": 1000, "id": "auto-20261116-gigared-4"}, {"canal": "web", "competidor": "gigared", "creado": 1794829092356, "distrito": "", "duracion": "3 meses", "enlace": "https://gigaredcentro.com/home", "fecha": "2026-11-16", "nota": "Simétrico, router Wi-Fi 6, instalación gratis.", "plan": "Plan 3 Solo Internet 800 Mbps", "precioPromo": 45, "precioRegular": 90, "registradoPor": "Monitoreo automático", "velocidad": 800, "id": "auto-20261116-gigared-3"}, {"canal": "web", "competidor": "gigared", "creado": 1794829092355, "distrito": "", "duracion": "3 meses", "enlace": "https://gigaredcentro.com/home", "fecha": "2026-11-16", "nota": "Simétrico, router Wi-Fi 6, instalación gratis. Dúo con TV al mismo precio promocional.", "plan": "Plan 2 Solo Internet 600 Mbps", "precioPromo": 35, "precioRegular": 70, "registradoPor": "Monitoreo automático", "velocidad": 600, "id": "auto-20261116-gigared-2"}, {"canal": "web", "competidor": "gigared", "creado": 1794829092354, "distrito": "", "duracion": "3 meses", "enlace": "https://gigaredcentro.com/home", "fecha": "2026-11-16", "nota": "Simétrico, instalación gratis, solo nuevas contrataciones, sujeto a factibilidad. Cobertura: Huancayo y El Tambo (+15 zonas).", "plan": "Plan 1 Solo Internet 300 Mbps", "precioPromo": 25, "precioRegular": 50, "registradoPor": "Monitoreo automático", "velocidad": 300, "id": "auto-20261116-gigared-1"}, {"canal": "web", "competidor": "win", "creado": 1794829092353, "distrito": "huancayo", "duracion": "3 meses", "enlace": "https://win.pe/huancayo", "fecha": "2026-11-16", "nota": "Incluye +90 canales (fútbol local), telefonía y 2 mesh a solicitud. Con DGO Full: S/79.95 x 3 meses (reg. S/159.90).", "plan": "1000 Mbps + WINTV L1MAX Premium + FONOWIN", "precioPromo": 64.95, "precioRegular": 129.9, "registradoPor": "Monitoreo automático", "velocidad": 1000, "id": "auto-20261116-win-4"}, {"canal": "web", "competidor": "win", "creado": 1794829092352, "distrito": "huancayo", "duracion": "3 meses", "enlace": "https://win.pe/huancayo", "fecha": "2026-11-16", "nota": "Incluye +80 canales y telefonía. Versión con L1MAX y 1 mesh: S/59.95 x 3 meses (reg. S/119.90).", "plan": "750 Mbps + WINTV Premium + FONOWIN", "precioPromo": 49.95, "precioRegular": 99.9, "registradoPor": "Monitoreo automático", "velocidad": 750, "id": "auto-20261116-win-3"}, {"canal": "web", "competidor": "win", "creado": 1794829092351, "distrito": "huancayo", "duracion": "3 meses", "enlace": "https://win.pe/huancayo", "fecha": "2026-11-16", "nota": "Incluye +80 canales y telefonía. Solo internet 550 Mbps: S/89 sin promo listada.", "plan": "550 Mbps + WINTV Premium + FONOWIN", "precioPromo": 44.95, "precioRegular": 89.9, "registradoPor": "Monitoreo automático", "velocidad": 550, "id": "auto-20261116-win-2"}, {"canal": "web", "competidor": "win", "creado": 1794829092350, "distrito": "huancayo", "duracion": "3 meses", "enlace": "https://win.pe/huancayo", "fecha": "2026-11-16", "nota": "Incluye telefonía fija y router ONT. La página muestra además 'X6 meses a S/1', sin detallar. Promociones aplican para Huancayo.", "plan": "350 Mbps + FONOWIN", "precioPromo": 39.5, "precioRegular": 79, "registradoPor": "Monitoreo automático", "velocidad": 350, "id": "auto-20261116-win-1"}, {"canal": "web", "competidor": "movistar", "creado": 1794829092349, "distrito": "", "duracion": "No indicada", "enlace": "https://www.movistar.com.pe/internet-fibra-optica-junin", "fecha": "2026-11-16", "nota": "Precio 'desde' indicado en las preguntas frecuentes de la página de Junín. Planes de hasta 1000 Mbps desde S/149.90.", "plan": "Fibra 100 Mbps (plan de entrada)", "precioPromo": null, "precioRegular": 59.9, "registradoPor": "Monitoreo automático", "velocidad": 100, "id": "auto-20261116-movistar-2"}, {"canal": "web", "competidor": "movistar", "creado": 1794829092348, "distrito": "", "duracion": "No indicada", "enlace": "https://www.movistar.com.pe/internet-fibra-optica-junin", "fecha": "2026-11-16", "nota": "Banner en la página de Junín: instalación gratis y bono a 1000 Mbps. No distingue precio promocional y regular. Cobertura por provincias: Huancayo, Concepción, Jauja, Chupaca, entre otras.", "plan": "Fibra 400 Mbps", "precioPromo": 69.9, "precioRegular": null, "registradoPor": "Monitoreo automático", "velocidad": 400, "id": "auto-20261116-movistar-1"}, {"canal": "web", "competidor": "wow", "creado": 1794829092347, "distrito": "", "duracion": "6 recibos con pago puntual; vigente 01–30 nov 2026", "enlace": "https://wowperu.pe/promociones/", "fecha": "2026-11-16", "nota": "Dúo con telefonía: S/104.90 (reg. S/114.90). Pierde el descuento si paga tarde. Sujeto a cobertura por ubigeo.", "plan": "Pago Puntual Max Noviembre 1000 Mbps Solo", "precioPromo": 94.9, "precioRegular": 104.9, "registradoPor": "Monitoreo automático", "velocidad": 1000, "id": "auto-20261116-wow-3"}, {"canal": "web", "competidor": "wow", "creado": 1794829092346, "distrito": "", "duracion": "6 recibos con pago puntual; vigente 01–30 nov 2026", "enlace": "https://wowperu.pe/promociones/", "fecha": "2026-11-16", "nota": "Sube a 1000 Mbps por 6 meses. Dúo con telefonía: S/94.90 (reg. S/99.90). Sujeto a cobertura por ubigeo.", "plan": "Más Velocidad Noviembre I 500 Mbps Solo", "precioPromo": 84.9, "precioRegular": 89.9, "registradoPor": "Monitoreo automático", "velocidad": 500, "id": "auto-20261116-wow-2"}, {"canal": "web", "competidor": "wow", "creado": 1794829092345, "distrito": "", "duracion": "6 recibos con pago puntual; vigente 01–30 nov 2026", "enlace": "https://wowperu.pe/promociones/", "fecha": "2026-11-16", "nota": "Sube a 500 Mbps por 6 meses. Solo nuevos clientes; sujeto a cobertura por ubigeo (SIRT OSIPTEL). Plazo forzoso sin duración indicada. Cobertura en Huancayo no confirmada en la página.", "plan": "Velocidad Especial Noviembre 300 Mbps Solo", "precioPromo": 74.9, "precioRegular": 84.9, "registradoPor": "Monitoreo automático", "velocidad": 300, "id": "auto-20261116-wow-1"}], "alertas": [{"competidor": "Claro / WOW", "creado": 1794829092371, "enlace": "https://infomercado.pe/compra-de-wow-por-claro-iria-a-una-segunda-fase-de-revision-en-indecopi/", "fecha": "2026-11-16", "fuente": "Infomercado", "prioridad": "media", "texto": "Según Infomercado (9 nov, citando a Semana Económica), Indecopi evaluaría pasar la compra de WOW por Claro a una segunda fase de revisión (90 a 185 días hábiles), porque juntos superarían el 70% del internet fijo en al menos ocho departamentos. El cierre se retrasaría meses: ventana para que Fiber Centro capte clientes de WOW antes de la integración.", "tipo": "otro", "id": "auto-20261116-5"}, {"competidor": "WOW", "creado": 1794829092370, "enlace": "https://wowperu.pe/promociones/", "fecha": "2026-11-16", "fuente": "Web oficial WOW", "prioridad": "media", "texto": "WOW lanzó promos de noviembre (vigentes hasta el 30/11): 300 Mbps a S/74.90 con subida a 500 Mbps por 6 meses y 1000 Mbps a S/94.90, con pago puntual. La página no confirma cobertura en Huancayo; la disponibilidad depende del ubigeo en OSIPTEL.", "tipo": "nueva_oferta", "id": "auto-20261116-4"}, {"competidor": "Movistar", "creado": 1794829092369, "enlace": "https://www.movistar.com.pe/internet-fibra-optica-junin", "fecha": "2026-11-16", "fuente": "Web oficial Movistar", "prioridad": "alta", "texto": "Movistar promociona en su página de Junín fibra de 400 Mbps a S/69.90 con instalación gratis y bono a 1000 Mbps; plan de entrada desde S/59.90 (100 Mbps). Cubre las provincias de Huancayo, Concepción y Jauja.", "tipo": "nueva_oferta", "id": "auto-20261116-3"}, {"competidor": "WIN", "creado": 1794829092368, "enlace": "https://win.pe/huancayo", "fecha": "2026-11-16", "fuente": "Web oficial WIN", "prioridad": "alta", "texto": "WIN Huancayo vende 350 Mbps + telefonía a S/39.50 y 1000 Mbps + L1MAX + 2 mesh a S/64.95 por 3 meses (50% de descuento sobre S/79 y S/129.90). Empaqueta fútbol local, un gancho que Fiber Centro debe igualar o contrarrestar con precio estable.", "tipo": "nueva_oferta", "id": "auto-20261116-2"}, {"competidor": "Gigared", "creado": 1794829092367, "enlace": "https://gigaredcentro.com/home", "fecha": "2026-11-16", "fuente": "Web oficial Gigared", "prioridad": "alta", "texto": "Gigared ofrece fibra simétrica de 1000 Mbps a S/50 y de 300 Mbps a S/25 por 3 meses (precio regular S/100 y S/50), con instalación gratis en Huancayo y El Tambo. Es el precio por Mbps más agresivo de la zona y presiona directamente a Fiber Centro en sus dos distritos principales.", "tipo": "nueva_oferta", "id": "auto-20261116-1"}, {"competidor": "Claro / WOW", "creado": 1794347300000, "enlace": "https://gestion.pe/economia/empresas/tras-compra-de-wow-claro-acelera-despliegue-de-fibra-optica-con-5429-km-en-2026-noticia/", "fecha": "2026-11-10", "fuente": "Gestión", "prioridad": "alta", "texto": "América Móvil (Claro) acordó comprar el 100% de WOW en julio de 2026; la operación aún requiere aprobación. En agosto, Claro anunció su mayor despliegue de fibra de 2026.", "tipo": "otro", "id": "base-claro-wow"}], "monitoreo": {"creado": 1794347300000, "resumen": "Primera carga de precios: 22 ofertas nuevas de 7 competidores (WOW, Movistar, WIN, Gigared, Cable Red, ProRed, Telecable), 0 cambios de precio y ningún competidor nuevo confirmado en la zona.", "ultimaEjecucion": "16 nov 2026"}, "planes": []};
+(()=>{
+  canWrite = false;
+  captures = SNAP.ofertas;
+  fcPlans = (SNAP.planes||[]).filter(p=>p && typeof p.v==="number");
+  const cap = document.getElementById("capBox"); if(cap) (cap.closest(".card")||cap).style.display="none";
+  const fa = document.getElementById("fcAdd"); if(fa){ fa.disabled=true; }
+  $("#dbStatus").textContent = "Copia de solo lectura con los datos al " + (SNAP.monitoreo.ultimaEjecucion||"") + ".";
+  renderAll();
+  const tl = {nueva_oferta:"Nueva oferta",cambio_precio:"Cambio de precio",nuevo_competidor:"Competidor nuevo",cobertura:"Nueva cobertura",otro:"Aviso"};
+  const L = SNAP.alertas;
+  $("#autoAlerts").innerHTML = L.length ? L.map(a=>`<div class="card alert ${a.prioridad==='alta'?'':'i'}"><h4>${esc(tl[a.tipo]||'Aviso')} · ${esc(a.competidor||'')}</h4><p>${esc(a.texto||'')}</p><div class="src" style="margin-top:6px">${esc(a.fecha||'')}${safeUrl(a.enlace)?` · <a href="${esc(safeUrl(a.enlace))}" target="_blank" rel="noopener">${esc(a.fuente||'fuente')}</a>`:''}</div></div>`).join("") : `<p class="note">Aún no hay alertas automáticas.</p>`;
+  const m = SNAP.monitoreo;
+  if(m && m.ultimaEjecucion) $("#autoTxt").innerHTML = `Última actualización automática: <b>${esc(m.ultimaEjecucion)}</b>${m.resumen?" · "+esc(m.resumen):""} · <i>copia sin conexión</i>`;
+})();
+</script>
+</body>
+</html>
